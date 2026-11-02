@@ -47,6 +47,7 @@ CREATE TABLE IF NOT EXISTS tank_state (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     asset_id TEXT NOT NULL,
     timestamp TEXT NOT NULL,          -- UTC ISO 8601
+    received_at TEXT NOT NULL,         -- when the processor received it (UTC)
     level_pct REAL, inflow_lpm REAL, outflow_lpm REAL,
     pump_on INTEGER,
     predicted_level_pct REAL,
