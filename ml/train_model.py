@@ -8,11 +8,17 @@ Needs data/dataset.csv from:    python ml/generate_dataset.py
 """
 import csv
 import json
+import argparse
 from collections import defaultdict
 from pathlib import Path
 
 import joblib
 import numpy as np
+
+from sklearn.neural_network import MLPRegressor
+from sklearn.pipeline import make_pipeline
+from sklearn.preprocessing import StandardScaler
+
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.linear_model import LinearRegression
 from sklearn.metrics import (confusion_matrix, mean_absolute_error, mean_squared_error,
@@ -93,6 +99,13 @@ def early_warning(y_true, level_now, flags):
 
 
 def main():
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--models", nargs="+",
+                        choices=["linear_regression", "random_forest", "neural_network"],
+                        help="train only these candidates (default: all)")
+    args = parser.parse_args()
+
     if not DATASET.exists():
         raise SystemExit("data/dataset.csv not found. Run: python ml/generate_dataset.py")
 
@@ -106,7 +119,14 @@ def main():
         "linear_regression": LinearRegression(),
         "random_forest": RandomForestRegressor(n_estimators=50, max_depth=8, min_samples_leaf=20,
                                                n_jobs=-1, random_state=42),
+        "neural_network": make_pipeline(
+            StandardScaler(),
+            MLPRegressor(hidden_layer_sizes=(32, 16), activation="relu",
+                         alpha=1e-3, max_iter=150, random_state=42)),                                       
     }
+
+    if args.models:
+        candidates = {n: m for n, m in candidates.items() if n in args.models}
 
     # 1. Train both, choose on VALIDATION runs only
     X_val, y_val, _ = data["val"]
