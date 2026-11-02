@@ -1,16 +1,22 @@
-"""Subscribes to raw tank messages, validates them, stores them in SQLite.
+"""Subscribes to raw tank messages, validates, stores, adds aggregates and a baseline
+alarm, then publishes an enriched message.
 
 Run:  python processor/processor.py
 """
 import argparse
+import json
 import time
 
 import paho.mqtt.client as mqtt
 
+from aggregates import RollingStats
+from alarm import rule_based_alarm
 from storage import Storage
 from validation import validate_message
 
 RAW_TOPIC = "twin/tank_01/raw"
+ENRICHED_TOPIC = "twin/tank_01/enriched"
+HORIZON_S = 60
 
 
 def main():
@@ -21,6 +27,7 @@ def main():
     args = parser.parse_args()
 
     storage = Storage(args.db)
+    stats = RollingStats(window=60)
     counts = {"valid": 0, "rejected": 0}
     print(f"Database: {args.db} (already holds {storage.count()} rows)")
 
@@ -34,15 +41,29 @@ def main():
             counts["rejected"] += 1
             print(f"REJECTED ({reason}): {msg.payload[:80]!r}")
             return
+
+        rolling = stats.update(data["level_pct"], data["inflow_lpm"])
+        alarm = rule_based_alarm(data)
+
         try:
-            storage.insert_state(data)
-        except Exception as error:       # a database problem must not kill the processor
+            storage.insert_state(data, alarm=alarm)
+        except Exception as error:
             print(f"DATABASE ERROR: {error}")
             return
         counts["valid"] += 1
+
+        enriched = {
+            **data,
+            **rolling,
+            "predicted_level_pct": None,      # the AI model fills this in later
+            "horizon_s": HORIZON_S,
+            "alarm": alarm,
+            "data_status": "ok",
+        }
+        client.publish(ENRICHED_TOPIC, json.dumps(enriched))
+
         print(f"SAVED  {data['timestamp']}  level={data['level_pct']:6.2f}%  "
-              f"in={data['inflow_lpm']:5.2f}  out={data['outflow_lpm']:5.2f}  "
-              f"pump={'ON' if data['pump_on'] else 'off'}")
+              f"mean60={rolling['rolling_mean_level_pct']:6.2f}  alarm={alarm}")
 
     client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2)
     client.on_connect = on_connect

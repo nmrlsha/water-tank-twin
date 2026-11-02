@@ -39,6 +39,11 @@ The Kit extension only listens to `enriched` and `status`. It never talks to the
 | rolling_mean_level_pct | Mean level over the last 60 samples                       |
 | alarm                  | "none", "overflow_risk", "low_level" or "abnormal_inflow" |
 | data_status            | "ok" or "invalid"                                         |
+|rolling_max_inflow_lpm  | Highest inflow over the last 60 samples                   |
+
+Alarm Baseline Thresholds: >90% - overflow_risk
+                           <10% - low_level
+                           >30 lpm - abnormal_inflow
 
 ## 4. SQLite table
 

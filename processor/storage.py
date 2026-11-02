@@ -61,6 +61,23 @@ class Storage:
                 "SELECT * FROM tank_state ORDER BY id DESC LIMIT ?", (n,)).fetchall()
         return [dict(r) for r in rows]
 
+
+    def per_minute(self, minutes=10):
+        """Summary of each recent minute: mean level, max inflow, alarm count, sample count."""
+        with self.lock:
+            rows = self.conn.execute(
+                """SELECT substr(timestamp, 1, 16)            AS minute,
+                          ROUND(AVG(level_pct), 2)            AS mean_level_pct,
+                          ROUND(MAX(inflow_lpm), 2)           AS max_inflow_lpm,
+                          SUM(CASE WHEN alarm IS NOT NULL AND alarm != 'none'
+                                   THEN 1 ELSE 0 END)         AS alarm_count,
+                          COUNT(*)                            AS samples
+                   FROM tank_state
+                   GROUP BY minute
+                   ORDER BY minute DESC
+                   LIMIT ?""", (minutes,)).fetchall()
+        return [dict(r) for r in rows]
+    
     def close(self):
         with self.lock:
             self.conn.close()
