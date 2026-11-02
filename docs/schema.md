@@ -21,11 +21,12 @@ Valid ranges are used by the processor to reject bad input.
 
 ## 2. MQTT topics
 
-| Topic                 | Publisher | Subscriber    | Content                                 |
-|-----------------------|-----------|---------------|-----------------------------------------|
-| twin/tank_01/raw      | Simulator | Processor     | Raw message above                       |
-| twin/tank_01/enriched | Processor | Kit extension | Raw fields plus AI and aggregates       |
-| twin/tank_01/status   | Processor | Kit extension | Heartbeat, used to detect disconnection |
+| Topic                 | Publisher | Subscriber    | Content                                             |
+|-----------------------|-----------|---------------|-----------------------------------------------------|
+| twin/tank_01/raw      | Simulator | Processor     | Raw message above                                   |
+| twin/tank_01/enriched | Processor | Kit extension | Raw fields plus AI and aggregates                   |
+| twin/tank_01/status   | Processor | Kit extension | Heartbeat, used to detect disconnection             |
+| twin/tank_01/control  | Operator  | Simulator     | Plain-text mode name, e.g. abnormal_inflow, stopped |
 
 The Kit extension only listens to `enriched` and `status`. It never talks to the simulator directly, so the simulator can later be replaced by a real sensor.
 
