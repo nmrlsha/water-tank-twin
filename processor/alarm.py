@@ -14,3 +14,13 @@ def rule_based_alarm(data):
     if data["inflow_lpm"] >= ABNORMAL_INFLOW_LPM:
         return "abnormal_inflow"
     return "none"
+
+def ai_warning(predicted_level_pct):
+    """Warning derived from the AI forecast (compare with rule_based_alarm, the baseline)."""
+    if predicted_level_pct is None:
+        return "unavailable"
+    if predicted_level_pct >= OVERFLOW_PCT:
+        return "overflow_expected"
+    if predicted_level_pct <= LOW_PCT:
+        return "low_level_expected"
+    return "none"

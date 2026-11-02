@@ -6,3 +6,24 @@ services:
     volumes:
       - ./mosquitto.conf:/mosquitto/config/mosquitto.conf:ro
     restart: unless-stopped
+
+  processor:
+    build:
+      context: ..
+      dockerfile: processor/Dockerfile
+    volumes:
+      - tank_data:/app/data
+    depends_on:
+      - mosquitto
+    restart: unless-stopped
+
+  simulator:
+    build:
+      context: ..
+      dockerfile: simulator/Dockerfile
+    depends_on:
+      - mosquitto
+    restart: unless-stopped
+
+volumes:
+  tank_data:

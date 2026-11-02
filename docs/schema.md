@@ -32,19 +32,23 @@ The Kit extension only listens to `enriched` and `status`. It never talks to the
 
 ## 3. Enriched message (adds these fields)
 
-| Field                  | Meaning                                                   |
-|------------------------|-----------------------------------------------------------|
-| predicted_level_pct    | AI forecast of level at the horizon                       |
-| horizon_s              | How far ahead the forecast is, e.g. 60 seconds            |
-| rolling_mean_level_pct | Mean level over the last 60 samples                       |
-| alarm                  | "none", "overflow_risk", "low_level" or "abnormal_inflow" |
-| data_status            | "ok" or "invalid"                                         |
-|rolling_max_inflow_lpm  | Highest inflow over the last 60 samples                   |
+| Field                  | Meaning                                                                                                          |
+|------------------------|------------------------------------------------------------------------------------------------------------------|
+| predicted_level_pct    | AI forecast of level at the horizon                                                                              |
+| horizon_s              | How far ahead the forecast is, e.g. 60 seconds                                                                   |
+| rolling_mean_level_pct | Mean level over the last 60 samples                                                                              |
+| alarm                  | "none", "overflow_risk", "low_level" or "abnormal_inflow"                                                        |
+| data_status            | "ok" or "invalid"                                                                                                |
+| rolling_max_inflow_lpm | Highest inflow over the last 60 samples                                                                          |
+| prediction_status      | "ok", or "unavailable" while fewer than                                                                          |
+|                        | 31 readings of history exist                                                                                     |
+| ai_warning             | "overflow_expected" (forecast at or above 90%), "low_level_expected" (at or below 10%), "none", or "unavailable" |
 
 Alarm Baseline Thresholds: >90% - overflow_risk
                            <10% - low_level
                            >30 lpm - abnormal_inflow
 
+predicted_level_pct is the forecast for horizon_s seconds after the reading’s timestamp.
 ## 4. SQLite table
 
 ```sql

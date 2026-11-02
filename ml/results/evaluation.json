@@ -1,0 +1,216 @@
+{
+  "version": "v2_delta_target",
+  "model": "random_forest",
+  "horizon_s": 60,
+  "window_s": 30,
+  "features": [
+    "level_now",
+    "inflow_now",
+    "outflow_now",
+    "pump_now",
+    "level_change_10s",
+    "level_change_30s",
+    "mean_inflow_10s",
+    "mean_outflow_10s",
+    "mean_inflow_30s",
+    "mean_outflow_30s",
+    "pump_on_fraction_30s",
+    "net_flow_now",
+    "mean_net_flow_10s",
+    "mean_net_flow_30s"
+  ],
+  "train_samples": 68400,
+  "validation": {
+    "linear_regression": {
+      "mae": 3.696,
+      "rmse": 5.26
+    },
+    "random_forest": {
+      "mae": 2.585,
+      "rmse": 4.621
+    },
+    "neural_network": {
+      "mae": 2.605,
+      "rmse": 4.585
+    }
+  },
+  "evaluation": {
+    "test": {
+      "samples": 17100,
+      "model": {
+        "mae": 2.915,
+        "rmse": 5.06
+      },
+      "persistence_baseline": {
+        "mae": 9.367,
+        "rmse": 11.156
+      },
+      "trend_baseline": {
+        "mae": 3.832,
+        "rmse": 7.141
+      },
+      "all_candidates_for_information": {
+        "linear_regression": {
+          "mae": 3.977,
+          "rmse": 5.743
+        },
+        "random_forest": {
+          "mae": 2.915,
+          "rmse": 5.06
+        },
+        "neural_network": {
+          "mae": 2.868,
+          "rmse": 4.993
+        }
+      },
+      "by_scenario_at_target": {
+        "abnormal_inflow": {
+          "samples": 2855,
+          "model": {
+            "mae": 5.64,
+            "rmse": 9.176
+          },
+          "persistence_baseline": {
+            "mae": 13.525,
+            "rmse": 17.443
+          },
+          "trend_baseline": {
+            "mae": 6.505,
+            "rmse": 11.393
+          }
+        },
+        "normal": {
+          "samples": 10220,
+          "model": {
+            "mae": 2.172,
+            "rmse": 3.248
+          },
+          "persistence_baseline": {
+            "mae": 9.507,
+            "rmse": 10.34
+          },
+          "trend_baseline": {
+            "mae": 3.612,
+            "rmse": 6.266
+          }
+        },
+        "pump_failure": {
+          "samples": 4025,
+          "model": {
+            "mae": 2.87,
+            "rmse": 4.717
+          },
+          "persistence_baseline": {
+            "mae": 6.063,
+            "rmse": 6.435
+          },
+          "trend_baseline": {
+            "mae": 2.495,
+            "rmse": 4.987
+          }
+        }
+      },
+      "overflow_early_warning": {
+        "samples": 14781,
+        "real_overflows_ahead": 903,
+        "model": {
+          "precision": 0.879,
+          "recall": 0.806,
+          "f1": 0.841,
+          "tp": 728,
+          "fp": 100,
+          "fn": 175,
+          "tn": 13778
+        },
+        "trend_extrapolation": {
+          "precision": 0.715,
+          "recall": 0.986,
+          "f1": 0.829,
+          "tp": 890,
+          "fp": 355,
+          "fn": 13,
+          "tn": 13523
+        },
+        "threshold_75": {
+          "precision": 0.349,
+          "recall": 0.792,
+          "f1": 0.484,
+          "tp": 715,
+          "fp": 1334,
+          "fn": 188,
+          "tn": 12544
+        },
+        "threshold_90_current_alarm": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "tp": 0,
+          "fp": 0,
+          "fn": 903,
+          "tn": 13878
+        }
+      }
+    },
+    "heldout_scenario": {
+      "samples": 17100,
+      "model": {
+        "mae": 6.056,
+        "rmse": 9.261
+      },
+      "persistence_baseline": {
+        "mae": 8.147,
+        "rmse": 8.933
+      },
+      "trend_baseline": {
+        "mae": 3.065,
+        "rmse": 5.63
+      },
+      "all_candidates_for_information": {
+        "linear_regression": {
+          "mae": 5.885,
+          "rmse": 7.211
+        },
+        "random_forest": {
+          "mae": 6.056,
+          "rmse": 9.261
+        },
+        "neural_network": {
+          "mae": 9.661,
+          "rmse": 14.998
+        }
+      },
+      "by_scenario_at_target": {
+        "normal": {
+          "samples": 10496,
+          "model": {
+            "mae": 2.635,
+            "rmse": 4.288
+          },
+          "persistence_baseline": {
+            "mae": 7.58,
+            "rmse": 8.077
+          },
+          "trend_baseline": {
+            "mae": 2.824,
+            "rmse": 5.12
+          }
+        },
+        "pump_stuck_on": {
+          "samples": 6604,
+          "model": {
+            "mae": 11.492,
+            "rmse": 13.887
+          },
+          "persistence_baseline": {
+            "mae": 9.047,
+            "rmse": 10.146
+          },
+          "trend_baseline": {
+            "mae": 3.448,
+            "rmse": 6.357
+          }
+        }
+      }
+    }
+  }
+}

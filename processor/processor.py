@@ -1,7 +1,7 @@
-"""Subscribes to raw tank messages, validates, stores, adds aggregates and a baseline
-alarm, then publishes an enriched message.
+"""Subscribes to raw tank messages, validates them, predicts the level 60 s ahead,
+stores everything in SQLite, adds aggregates and alarms, and publishes an enriched message.
 
-Run:  python processor/processor.py
+Runs inside Docker (see deploy/docker-compose.yml).
 """
 import argparse
 import json
@@ -10,13 +10,13 @@ import time
 import paho.mqtt.client as mqtt
 
 from aggregates import RollingStats
-from alarm import rule_based_alarm
+from alarm import ai_warning, rule_based_alarm
+from predictor import Predictor
 from storage import Storage
 from validation import validate_message
 
 RAW_TOPIC = "twin/tank_01/raw"
 ENRICHED_TOPIC = "twin/tank_01/enriched"
-HORIZON_S = 60
 
 
 def main():
@@ -24,12 +24,15 @@ def main():
     parser.add_argument("--host", default="127.0.0.1")
     parser.add_argument("--port", type=int, default=1883)
     parser.add_argument("--db", default="data/tank.db")
+    parser.add_argument("--model", default="ml/models/water_level_model.joblib")
     args = parser.parse_args()
 
     storage = Storage(args.db)
     stats = RollingStats(window=60)
+    predictor = Predictor.from_file(args.model)
     counts = {"valid": 0, "rejected": 0}
     print(f"Database: {args.db} (already holds {storage.count()} rows)")
+    print(f"Model loaded from {args.model} (horizon {predictor.horizon_s} s)")
 
     def on_connect(client, userdata, flags, reason_code, properties):
         print(f"Connected to broker (reason: {reason_code})")
@@ -44,9 +47,15 @@ def main():
 
         rolling = stats.update(data["level_pct"], data["inflow_lpm"])
         alarm = rule_based_alarm(data)
+        try:
+            predicted = predictor.update(data)
+        except Exception as error:         # a model problem must not stop the processor
+            print(f"PREDICTION ERROR: {error}")
+            predicted = None
+        warning = ai_warning(predicted)
 
         try:
-            storage.insert_state(data, alarm=alarm)
+            storage.insert_state(data, predicted_level_pct=predicted, alarm=alarm)
         except Exception as error:
             print(f"DATABASE ERROR: {error}")
             return
@@ -55,15 +64,18 @@ def main():
         enriched = {
             **data,
             **rolling,
-            "predicted_level_pct": None,      # the AI model fills this in later
-            "horizon_s": HORIZON_S,
+            "predicted_level_pct": predicted,
+            "horizon_s": predictor.horizon_s,
+            "prediction_status": "ok" if predicted is not None else "unavailable",
             "alarm": alarm,
+            "ai_warning": warning,
             "data_status": "ok",
         }
         client.publish(ENRICHED_TOPIC, json.dumps(enriched))
 
+        shown = f"{predicted:6.2f}" if predicted is not None else "  n/a "
         print(f"SAVED  {data['timestamp']}  level={data['level_pct']:6.2f}%  "
-              f"mean60={rolling['rolling_mean_level_pct']:6.2f}  alarm={alarm}")
+              f"pred+{predictor.horizon_s}s={shown}%  alarm={alarm}  ai={warning}")
 
     client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2)
     client.on_connect = on_connect
