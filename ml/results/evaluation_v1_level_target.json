@@ -1,0 +1,134 @@
+{
+  "model": "random_forest",
+  "horizon_s": 60,
+  "window_s": 30,
+  "features": [
+    "level_now",
+    "inflow_now",
+    "outflow_now",
+    "pump_now",
+    "level_change_10s",
+    "level_change_30s",
+    "mean_inflow_10s",
+    "mean_outflow_10s",
+    "mean_inflow_30s",
+    "mean_outflow_30s",
+    "pump_on_fraction_30s"
+  ],
+  "train_samples": 68400,
+  "validation": {
+    "linear_regression": {
+      "mae": 3.743,
+      "rmse": 5.283
+    },
+    "random_forest": {
+      "mae": 2.844,
+      "rmse": 4.751
+    }
+  },
+  "evaluation": {
+    "test": {
+      "samples": 17100,
+      "model": {
+        "mae": 3.154,
+        "rmse": 5.13
+      },
+      "persistence_baseline": {
+        "mae": 9.367,
+        "rmse": 11.156
+      },
+      "by_scenario_at_target": {
+        "abnormal_inflow": {
+          "samples": 2855,
+          "model": {
+            "mae": 5.762,
+            "rmse": 9.068
+          },
+          "persistence_baseline": {
+            "mae": 13.525,
+            "rmse": 17.443
+          }
+        },
+        "normal": {
+          "samples": 10220,
+          "model": {
+            "mae": 2.373,
+            "rmse": 3.414
+          },
+          "persistence_baseline": {
+            "mae": 9.507,
+            "rmse": 10.34
+          }
+        },
+        "pump_failure": {
+          "samples": 4025,
+          "model": {
+            "mae": 3.286,
+            "rmse": 4.89
+          },
+          "persistence_baseline": {
+            "mae": 6.063,
+            "rmse": 6.435
+          }
+        }
+      },
+      "overflow_early_warning": {
+        "samples": 14781,
+        "real_overflows_ahead": 903,
+        "model": {
+          "precision": 0.879,
+          "recall": 0.749,
+          "f1": 0.809,
+          "tp": 676,
+          "fp": 93,
+          "fn": 227,
+          "tn": 13785
+        },
+        "threshold_rule": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "tp": 0,
+          "fp": 0,
+          "fn": 903,
+          "tn": 13878
+        }
+      }
+    },
+    "heldout_scenario": {
+      "samples": 17100,
+      "model": {
+        "mae": 11.745,
+        "rmse": 16.793
+      },
+      "persistence_baseline": {
+        "mae": 8.147,
+        "rmse": 8.933
+      },
+      "by_scenario_at_target": {
+        "normal": {
+          "samples": 10496,
+          "model": {
+            "mae": 7.798,
+            "rmse": 12.483
+          },
+          "persistence_baseline": {
+            "mae": 7.58,
+            "rmse": 8.077
+          }
+        },
+        "pump_stuck_on": {
+          "samples": 6604,
+          "model": {
+            "mae": 18.017,
+            "rmse": 21.968
+          },
+          "persistence_baseline": {
+            "mae": 9.047,
+            "rmse": 10.146
+          }
+        }
+      }
+    }
+  }
+}

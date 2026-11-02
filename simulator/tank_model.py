@@ -24,8 +24,9 @@ def _clamp(value, low, high):
 
 
 class TankSimulator:
-    def __init__(self, seed=None, level_pct=50.0):
+    def __init__(self, seed=None, level_pct=50.0, inflow_offset_lpm=0.0):
         self.rng = random.Random(seed)   # same seed = same noise = reproducible runs
+        self.inflow_offset_lpm = inflow_offset_lpm   # shifts normal inflow (varied operating conditions)
         self.level_pct = level_pct       # true level (the reported one adds sensor noise)
         self.pump_on = False
         self.scenario = "normal"
@@ -44,7 +45,7 @@ class TankSimulator:
         if self.scenario == "abnormal_inflow":
             inflow = ABNORMAL_INFLOW_LPM + self.rng.gauss(0, 1.0)
         else:
-            inflow = (NOMINAL_INFLOW_LPM
+            inflow = (NOMINAL_INFLOW_LPM + self.inflow_offset_lpm
                       + 2.0 * math.sin(2 * math.pi * self.t / 300.0)   # slow daily-demand-like swing
                       + self.rng.gauss(0, 0.3))                         # sensor noise
 
