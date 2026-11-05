@@ -25,7 +25,7 @@ Valid ranges are used by the processor to reject bad input.
 |-----------------------|-----------|---------------|-----------------------------------------------------|
 | twin/tank_01/raw      | Simulator | Processor     | Raw message above                                   |
 | twin/tank_01/enriched | Processor | Kit extension | Raw fields plus AI and aggregates                   |
-| twin/tank_01/status   | Processor | Kit extension | Heartbeat, used to detect disconnection             |
+| twin/tank_01/status   | Processor (and the broker's last will) | Kit extension | Heartbeat, used to detect disconnection             |
 | twin/tank_01/control  | Operator  | Simulator     | Plain-text mode name, e.g. abnormal_inflow, stopped |
 
 The Kit extension only listens to `enriched` and `status`. It never talks to the simulator directly, so the simulator can later be replaced by a real sensor.
@@ -43,12 +43,19 @@ The Kit extension only listens to `enriched` and `status`. It never talks to the
 | prediction_status      | "ok", or "unavailable" while fewer than                                                                          |
 |                        | 31 readings of history exist                                                                                     |
 | ai_warning             | "overflow_expected" (forecast at or above 90%), "low_level_expected" (at or below 10%), "none", or "unavailable" |
+| processor              | "online", or "offline" (clean shutdown or broker Last Will)                                                      |
+| source                 | "live" (valid data in the last 5 s), "stale", "never_seen" (since start), or "unknown" (processor offline)       |
+| seconds_since_last_data| Age of the last valid raw message                                                                                |
+| last_data_timestamp    | Timestamp inside that message                                                                                    |
+|messages_valid / messages_rejected | Counters since the processor started                                                                  |
 
 Alarm Baseline Thresholds: >90% - overflow_risk
                            <10% - low_level
                            >30 lpm - abnormal_inflow
 
 predicted_level_pct is the forecast for horizon_s seconds after the reading’s timestamp.
+
+Rules for the display: processor offline -> show DISCONNECTED. Source stale -> show STALE and do not present values as live. No status message for 5 s (broker or network down) -> the Kit extension shows DISCONNECTED on its ow
 ## 4. SQLite table
 
 ```sql
