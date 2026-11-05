@@ -74,6 +74,18 @@ CREATE INDEX IF NOT EXISTS idx_time ON tank_state(asset_id, timestamp);
 
 Enable WAL mode (`PRAGMA journal_mode=WAL;`) so the processor can write while Grafana reads.
 
+## REST API (service `api`, port 8000, read-only access to SQLite)
+
+| Endpoint                                  | Purpose                                                |
+|-------------------------------------------|--------------------------------------------------------|
+| GET /health                               | Status, row count, latest timestamp                    |
+| GET /latest                               | Newest stored row                                      |
+| GET /history?minutes=10&step=1&limit=2000 | Readings from the last N minutes, oldest first         |
+| GET /aggregates?minutes=10                | Per-minute mean level, max inflow, alarm count, samples|
+| GET /alarms?minutes=60                    | Count of readings per alarm type                       |
+
+Errors: 503 when the database does not exist yet, 404 when it exists but holds no data, 422 for invalid parameters.
+
 ## 5. Key decisions
 
 - Sampling rate: 1 Hz
