@@ -25,5 +25,19 @@ services:
       - mosquitto
     restart: unless-stopped
 
+  api:
+    build:
+      context: ..
+      dockerfile: api/Dockerfile
+    ports:
+      - "8000:8000"
+    volumes:
+      - tank_data:/data
+    environment:
+      TANK_DB: /data/tank.db
+    depends_on:
+      - processor
+    restart: unless-stopped
+
 volumes:
   tank_data:
