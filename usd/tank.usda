@@ -1,0 +1,244 @@
+#usda 1.0
+(
+    defaultPrim = "World"
+    metersPerUnit = 1
+    timeCodesPerSecond = 24
+    upAxis = "Y"
+)
+
+def Xform "World"
+{
+    def Scope "Looks"
+    {
+        def Material "TankGlass"
+        {
+            token outputs:surface.connect = </World/Looks/TankGlass/Shader.outputs:surface>
+
+            def Shader "Shader"
+            {
+                uniform token info:id = "UsdPreviewSurface"
+                color3f inputs:diffuseColor = (0.8, 0.9, 1)
+                float inputs:opacity = 0.18
+                float inputs:roughness = 0.15
+                token outputs:surface
+            }
+        }
+
+        def Material "WaterMat"
+        {
+            token outputs:surface.connect = </World/Looks/WaterMat/Shader.outputs:surface>
+
+            def Shader "Shader"
+            {
+                uniform token info:id = "UsdPreviewSurface"
+                color3f inputs:diffuseColor = (0.1, 0.45, 0.9)
+                float inputs:opacity = 0.7
+                float inputs:roughness = 0.15
+                token outputs:surface
+            }
+        }
+    }
+
+    def Cube "Floor"
+    {
+        color3f[] primvars:displayColor = [(0.78, 0.79, 0.8)]
+        double size = 1
+        float3 xformOp:scale = (2.4, 0.02, 1.6)
+        double3 xformOp:translate = (0.2, -0.01, 0)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+    }
+
+    def Xform "Tank"
+    {
+        double3 xformOp:translate = (0, 0, 0)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
+
+        def Cylinder "Base"
+        {
+            uniform token axis = "Y"
+            double height = 0.02
+            color3f[] primvars:displayColor = [(0.35, 0.38, 0.42)]
+            double radius = 0.22
+            double3 xformOp:translate = (0, 0.01, 0)
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+        }
+
+        def Cylinder "Shell" (
+            prepend apiSchemas = ["MaterialBindingAPI"]
+        )
+        {
+            uniform token axis = "Y"
+            double height = 0.8
+            rel material:binding = </World/Looks/TankGlass>
+            color3f[] primvars:displayColor = [(0.8, 0.9, 1)]
+            double radius = 0.2
+            double3 xformOp:translate = (0, 0.4, 0)
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+        }
+
+        def Cylinder "Lid"
+        {
+            uniform token axis = "Y"
+            double height = 0.015
+            color3f[] primvars:displayColor = [(0.35, 0.38, 0.42)]
+            double radius = 0.21000000000000002
+            double3 xformOp:translate = (0, 0.8075, 0)
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+        }
+
+        def Xform "Water"
+        {
+            float3 xformOp:scale = (1, 0.5, 1)
+            double3 xformOp:translate = (0, 0.02, 0)
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+
+            def Cylinder "Geom" (
+                prepend apiSchemas = ["MaterialBindingAPI"]
+            )
+            {
+                uniform token axis = "Y"
+                double height = 0.76
+                rel material:binding = </World/Looks/WaterMat>
+                color3f[] primvars:displayColor = [(0.1, 0.45, 0.9)]
+                double radius = 0.19
+                double3 xformOp:translate = (0, 0.38, 0)
+                uniform token[] xformOpOrder = ["xformOp:translate"]
+            }
+        }
+
+        def Sphere "AlarmLight"
+        {
+            color3f[] primvars:displayColor = [(0.1, 0.8, 0.2)]
+            double radius = 0.035
+            double3 xformOp:translate = (0, 0.8600000000000001, 0)
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+        }
+    }
+
+    def Xform "Inlet"
+    {
+        double3 xformOp:translate = (0, 0, 0)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
+
+        def Cylinder "Pipe"
+        {
+            uniform token axis = "X"
+            double height = 0.55
+            color3f[] primvars:displayColor = [(0.35, 0.38, 0.42)]
+            double radius = 0.03
+            double3 xformOp:translate = (-0.44500000000000006, 0.7, 0)
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+        }
+
+        def Cylinder "Flange"
+        {
+            uniform token axis = "X"
+            double height = 0.03
+            color3f[] primvars:displayColor = [(0.55, 0.57, 0.6)]
+            double radius = 0.041999999999999996
+            double3 xformOp:translate = (-0.20500000000000002, 0.7, 0)
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+        }
+
+        def Sphere "FlowMarker"
+        {
+            color3f[] primvars:displayColor = [(0.2, 0.7, 0.9)]
+            double radius = 0.022
+            double3 xformOp:translate = (-0.67, 0.76, 0)
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+        }
+    }
+
+    def Xform "Outlet"
+    {
+        double3 xformOp:translate = (0, 0, 0)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
+
+        def Cylinder "Pipe"
+        {
+            uniform token axis = "X"
+            double height = 0.7
+            color3f[] primvars:displayColor = [(0.35, 0.38, 0.42)]
+            double radius = 0.03
+            double3 xformOp:translate = (0.52, 0.1, 0)
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+        }
+
+        def Cylinder "Flange"
+        {
+            uniform token axis = "X"
+            double height = 0.03
+            color3f[] primvars:displayColor = [(0.55, 0.57, 0.6)]
+            double radius = 0.041999999999999996
+            double3 xformOp:translate = (0.20500000000000002, 0.1, 0)
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+        }
+    }
+
+    def Xform "Pump"
+    {
+        double3 xformOp:translate = (0, 0, 0)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
+
+        def Cylinder "Body"
+        {
+            uniform token axis = "X"
+            double height = 0.16
+            color3f[] primvars:displayColor = [(0.2, 0.3, 0.6)]
+            double radius = 0.065
+            double3 xformOp:translate = (0.5, 0.1, 0)
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+        }
+
+        def Cylinder "Housing"
+        {
+            uniform token axis = "Y"
+            double height = 0.07
+            color3f[] primvars:displayColor = [(0.25, 0.35, 0.65)]
+            double radius = 0.075
+            double3 xformOp:translate = (0.5, 0.16, 0)
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+        }
+
+        def Sphere "Indicator"
+        {
+            color3f[] primvars:displayColor = [(0.55, 0.55, 0.55)]
+            double radius = 0.025
+            double3 xformOp:translate = (0.5, 0.23500000000000001, 0)
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+        }
+
+        def Cube "Stand"
+        {
+            color3f[] primvars:displayColor = [(0.35, 0.38, 0.42)]
+            double size = 1
+            float3 xformOp:scale = (0.2, 0.04, 0.14)
+            double3 xformOp:translate = (0.5, 0.02, 0)
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        }
+    }
+
+    def "Lights"
+    {
+        def DistantLight "Sun"
+        {
+            float inputs:intensity = 2500
+            float3 xformOp:rotateXYZ = (-50, 35, 0)
+            uniform token[] xformOpOrder = ["xformOp:rotateXYZ"]
+        }
+
+        def DomeLight "Sky"
+        {
+            float inputs:intensity = 600
+        }
+    }
+
+    def Camera "Camera"
+    {
+        float focalLength = 28
+        float3 xformOp:rotateXYZ = (-12, 0, 0)
+        double3 xformOp:translate = (0.35, 0.75, 1.75)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+    }
+}
+
