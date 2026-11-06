@@ -1,0 +1,22 @@
+Lab day checklist (in order)
+Check Docker: docker --version and docker ps. This is the biggest risk, so do it first.
+Get your code: git clone https://github.com/nmrlsha/water-tank-twin.git, or git pull if it’s already there.
+Start the backend: cd deploy then docker compose up -d --build. Then run docker compose ps and confirm 4 services are running.
+Get a Kit App Template folder: use the one that already worked, or clone https://github.com/NVIDIA-Omniverse/kit-app-template. Open a terminal inside it.
+Create the app: .\repo.bat template new, choose Application, then a base template (the docs example uses “Kit Base Editor”). Accept the default names or choose your own.
+Create the extension: run .\repo.bat template new again, choose Extension, then the Python UI template. Its exact name varies by version; the docs show python-extension-window in an older one. Name it something like nmrlsha.tank_twin. The folder appears under source/extensions/.
+Add the extension to the app: open the app’s .kit file (under source/apps/) and add your extension name under [dependencies], like the template’s example extension.
+Copy files in: copy mqtt_listener.py, twin_state.py and twin_logic.py into the extension’s inner module folder, the one holding extension.py, for example source/extensions/nmrlsha.tank_twin/nmrlsha/tank_twin/.
+Replace the body of the generated extension.py with extension_step3.py, keeping the template’s class name.
+Add the paho dependency: use extension_toml_snippet.txt in the extension’s config/extension.toml. That pipapi mechanism is from memory, so check it against the docs. Fallback if it fails: install paho into Kit’s own Python.
+Build and launch: .\repo.bat build then .\repo.bat launch. The first build downloads a lot and can take a while.
+Look at the console for [tank_twin] startup, then lines like [tank_twin] LIVE {...}.
+Success looks like
+The app opens without red errors.
+The console shows [tank_twin] LIVE with a Water level that changes.
+Stop the simulator (docker compose stop simulator) and it turns STALE.
+Common problems
+No module named paho: the dependency didn’t install. Check the .toml, or the console log for pip errors; the lab PC may block the internet.
+The extension doesn’t load: the [[python.module]] name must match the folder path exactly, and the extension must be listed in the .kit file.
+Nothing prints: check the broker with docker compose ps. Port 1883 must be mapped, and the extension uses 127.0.0.1.
+A Windows security pop-up or blocked file: the same Application Control issue as on your laptop. Tell the lab staff.

@@ -1,0 +1,13 @@
+# Add to source/extensions/<your.extension.name>/config/extension.toml
+# (UNVERIFIED: check against the docs / the template's own file on lab day)
+
+[dependencies]
+"omni.kit.pipapi" = {}              # lets the extension pip-install its own packages
+
+[python.pipapi]
+requirements = ["paho-mqtt"]
+use_online_index = true
+
+# Also make sure this exists (the template already has it; just check the name matches your module):
+[[python.module]]
+name = "<your.extension.name>"

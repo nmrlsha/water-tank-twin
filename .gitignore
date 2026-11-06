@@ -7,3 +7,9 @@ venv/
 *.db-shm
 .env
 .vscode/
+
+kit_app/_build/
+kit_app/_compiler/
+kit_app/_repo/
+kit_app/_testoutput/
+kit_app/.vscode/

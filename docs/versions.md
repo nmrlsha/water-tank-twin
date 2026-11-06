@@ -12,4 +12,4 @@
 | Mosquitto | 2.1.2 |
 | Lab PC OS / GPU / driver | (fill in on lab day) |
 | Kit SDK version | (fill in on lab day) |
-| kit-app-template commit | (fill in on lab day) |
+| kit-app-template commit | b8e9f2e4f2930d19e87e3702d4eeaf00d9846676 (branch: main) |
