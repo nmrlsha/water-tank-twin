@@ -6,7 +6,10 @@ import time
 from collections import deque
 from datetime import datetime, timezone
 
-import twin_logic as logic
+try:                                  # inside Kit this file is part of a package
+    from . import twin_logic as logic
+except ImportError:                   # on the laptop / pytest it is a plain module
+    import twin_logic as logic
 
 
 def timestamp_to_epoch(text):
