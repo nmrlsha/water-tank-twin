@@ -140,3 +140,10 @@ def prediction_marker_z(predicted_level_pct):
     if value != value:                       # NaN
         return None
     return TANK_HEIGHT_M * max(0.0, min(100.0, value)) / 100.0
+
+
+def light_material(data, state):
+    """Material for the warning light. Grey when the feed is not LIVE, so old data never looks healthy."""
+    if state != "LIVE" or data is None:
+        return MAT_PUMP_OFF                   # the model's grey material
+    return alarm_material(data)

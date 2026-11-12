@@ -26,3 +26,10 @@ def test_prediction_marker_height():
 def test_prediction_marker_unusable_values():
     for bad in (None, "x", float("nan")):
         assert t.prediction_marker_z(bad) is None
+
+
+def test_light_material_grey_when_not_live():
+    data = {"alarm": "none", "ai_warning": "none"}
+    assert t.light_material(data, "LIVE").endswith("LightGreen")
+    assert t.light_material(data, "STALE") == t.MAT_PUMP_OFF
+    assert t.light_material(None, "LIVE") == t.MAT_PUMP_OFF
