@@ -5,11 +5,21 @@ The Kit extension (written later) only has to APPLY what this file decides.
 """
 import json
 
-# ---- Where things live in usd/tank.usda (see usd/build_tank.py) -----------------
-PRIM_WATER = "/World/Tank/Water"              # scale Y  <- level
-PRIM_PUMP_LIGHT = "/World/Pump/Indicator"     # colour   <- pump on/off
-PRIM_ALARM_LIGHT = "/World/Tank/AlarmLight"   # colour   <- alarm state
+# ---- Where things live in usd/tank_twin.usda (our own model, made in Omniverse) --------
+# The tank is rotated -90 degrees about X, so the tank's LOCAL Z axis points UP in the world.
+PRIM_WATER = "/World/Tank_01/Water"                    # scale Z  <- level (pivot on the tank floor)
+PRIM_PUMP = "/World/Tank_01/Pump"                      # material <- pump on/off
+PRIM_ALARM_LIGHT = "/World/Tank_01/WarningLight"       # material <- alarm / AI warning
+PRIM_PREDICTION_MARKER = "/World/Tank_01/PredictionMarker"   # translate Z <- forecast level
+PRIM_PUMP_LIGHT = PRIM_PUMP                            # old name, kept so older code still works
 
+MAT_PUMP_ON = "/World/Looks/Mat_PumpOn"
+MAT_PUMP_OFF = "/World/Looks/Mat_PumpOff"
+MAT_LIGHT = {"ok": "/World/Looks/Mat_LightGreen",
+             "warning": "/World/Looks/Mat_LightAmber",
+             "alarm": "/World/Looks/Mat_LightRed"}
+
+TANK_HEIGHT_M = 0.8                           # water fills z = 0 .. 0.8 in the tank's local frame
 WATER_MIN_SCALE = 0.001                       # a scale of exactly 0 can break 3D maths
 
 # ---- Colours (red, green, blue from 0 to 1) --------------------------------------
@@ -106,3 +116,27 @@ def panel_rows(data, state):
         ("AI warning", str(data.get("ai_warning", "none")).replace("_", " ")),
         ("Data time (UTC)", str(data["timestamp"])),
     ]
+
+# ---- Helpers for the model with material switching (tank_twin.usda) -----------------
+def water_scale_vector(level_pct):
+    """Scale for the Water prim as (x, y, z). Only Z changes, because Z is 'up' for the tank."""
+    return (1.0, 1.0, water_scale_y(level_pct))
+
+
+def pump_material(pump_on):
+    return MAT_PUMP_ON if pump_on else MAT_PUMP_OFF
+
+
+def alarm_material(data):
+    return MAT_LIGHT[alarm_level(data)]
+
+
+def prediction_marker_z(predicted_level_pct):
+    """Height of the forecast marker in metres, or None when there is no usable forecast."""
+    try:
+        value = float(predicted_level_pct)
+    except (TypeError, ValueError):
+        return None
+    if value != value:                       # NaN
+        return None
+    return TANK_HEIGHT_M * max(0.0, min(100.0, value)) / 100.0
