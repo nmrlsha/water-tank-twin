@@ -53,3 +53,16 @@ def test_stale_banner(panel_module):
     p = panel_module.TankPanel()
     p.update(make_state(status="stale"))
     assert p._banner[0].startswith("STALE")
+
+
+def test_history_buttons_and_results(panel_module):
+    asked = []
+    p = panel_module.TankPanel(on_history_request=asked.append)
+    p._history_clicked(15)
+    assert asked == [15] and "loading" in p._history_status.text
+    p.show_history({"ok": True, "minutes": 15, "levels": [10.0, 20.0, 30.0], "alarm_readings": 2,
+                    "aggregate_lines": ["a=1", "b=2"], "error": None})
+    assert "3 points" in p._history_status.text and "min 10.0" in p._history_summary.text
+    assert p._history_aggregates.text == "a=1\nb=2"
+    p.show_history({"ok": False, "error": "history unavailable (API not reachable)"})
+    assert p._history_status.text.startswith("history unavailable")

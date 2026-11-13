@@ -16,21 +16,36 @@ ROW_LABELS = ("Connection", "Water level", "Inflow", "Outflow", "Pump", "AI fore
 EXTRA_LABELS = ("Trend", "Forecast change", "Data delay", "Rejected messages")
 
 
+HISTORY_CHOICES = (5, 15, 60)         # minutes offered by the History buttons
+
+
 class TankPanel:
-    def __init__(self):
+    def __init__(self, on_history_request=None):
+        """on_history_request(minutes) is called when a History button is clicked."""
         self._banner = ("Waiting for data", logic.GREY)
         self._values = {}
-        self._window = ui.Window("Tank Twin", width=380, height=640)
+        self._on_history_request = on_history_request
+        self._window = ui.Window("Tank Twin", width=400, height=900)
         with self._window.frame:
-            with ui.VStack(spacing=6):
-                self._banner_frame = ui.Frame(height=56)
-                self._banner_frame.set_build_fn(self._build_banner)
-                for name in ROW_LABELS + EXTRA_LABELS:
-                    with ui.HStack(height=22):
-                        ui.Label(name, width=140)
-                        self._values[name] = ui.Label("-")
-                ui.Label("Water level, last 2 minutes (%)", height=20)
-                self._plot = ui.Plot(ui.Type.LINE, 0.0, 100.0, 0.0, 0.0, height=90)
+            with ui.ScrollingFrame():
+                with ui.VStack(spacing=6):
+                    self._banner_frame = ui.Frame(height=56)
+                    self._banner_frame.set_build_fn(self._build_banner)
+                    for name in ROW_LABELS + EXTRA_LABELS:
+                        with ui.HStack(height=22):
+                            ui.Label(name, width=140)
+                            self._values[name] = ui.Label("-")
+                    ui.Label("Water level, last 2 minutes (%)", height=20)
+                    self._plot = ui.Plot(ui.Type.LINE, 0.0, 100.0, 0.0, 0.0, height=90)
+                    ui.Spacer(height=6)
+                    ui.Label("History (from the database)", height=22)
+                    with ui.HStack(height=28, spacing=6):
+                        for minutes in HISTORY_CHOICES:
+                            ui.Button(f"{minutes} min", clicked_fn=lambda m=minutes: self._history_clicked(m))
+                    self._history_status = ui.Label("press a button to load stored data", height=22)
+                    self._history_plot = ui.Plot(ui.Type.LINE, 0.0, 100.0, 0.0, 0.0, height=90)
+                    self._history_summary = ui.Label("", height=22)
+                    self._history_aggregates = ui.Label("", height=66)
 
     def _build_banner(self):
         text, rgb = self._banner
@@ -62,6 +77,25 @@ class TankPanel:
         levels = list(state.levels)
         if len(levels) >= 2:
             self._plot.set_data(*levels)
+
+    def _history_clicked(self, minutes):
+        self._history_status.text = f"loading last {minutes} min..."
+        if self._on_history_request:
+            self._on_history_request(minutes)
+
+    def show_history(self, result):
+        """result comes from HistoryClient.poll()."""
+        if not result["ok"]:
+            self._history_status.text = result["error"] or "history unavailable"
+            return
+        levels = result["levels"]
+        self._history_status.text = f"last {result['minutes']} min: {len(levels)} points"
+        if len(levels) >= 2:
+            self._history_plot.set_data(*levels)
+        self._history_summary.text = (
+            f"level min {min(levels):.1f} / mean {sum(levels) / len(levels):.1f} / max {max(levels):.1f} %"
+            f", alarm readings: {result['alarm_readings']}")
+        self._history_aggregates.text = "\n".join(result["aggregate_lines"])
 
     def destroy(self):
         self._window.destroy()
