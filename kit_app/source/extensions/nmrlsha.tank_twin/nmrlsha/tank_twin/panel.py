@@ -17,6 +17,8 @@ EXTRA_LABELS = ("Trend", "Forecast change", "Data delay", "Rejected messages")
 
 
 HISTORY_CHOICES = (5, 15, 60)         # minutes offered by the History buttons
+# A Plot has no visible line unless a colour is set. Colours here are AABBGGRR hex numbers.
+PLOT_STYLE = {"color": 0xFFFFC800, "background_color": 0xFF202020}
 
 
 class TankPanel:
@@ -35,15 +37,15 @@ class TankPanel:
                         with ui.HStack(height=22):
                             ui.Label(name, width=140)
                             self._values[name] = ui.Label("-")
-                    ui.Label("Water level, last 2 minutes (%)", height=20)
-                    self._plot = ui.Plot(ui.Type.LINE, 0.0, 100.0, 0.0, 0.0, height=90)
+                    self._plot_title = ui.Label("Water level, last 2 minutes (%)", height=20)
+                    self._plot = ui.Plot(ui.Type.LINE, 0.0, 100.0, 0.0, 0.0, height=90, style=PLOT_STYLE)
                     ui.Spacer(height=6)
                     ui.Label("History (from the database)", height=22)
                     with ui.HStack(height=28, spacing=6):
                         for minutes in HISTORY_CHOICES:
                             ui.Button(f"{minutes} min", clicked_fn=lambda m=minutes: self._history_clicked(m))
                     self._history_status = ui.Label("press a button to load stored data", height=22)
-                    self._history_plot = ui.Plot(ui.Type.LINE, 0.0, 100.0, 0.0, 0.0, height=90)
+                    self._history_plot = ui.Plot(ui.Type.LINE, 0.0, 100.0, 0.0, 0.0, height=90, style=PLOT_STYLE)
                     self._history_summary = ui.Label("", height=22)
                     self._history_aggregates = ui.Label("", height=66)
 
@@ -75,6 +77,7 @@ class TankPanel:
         self._values["Rejected messages"].text = str(state.rejected)
 
         levels = list(state.levels)
+        self._plot_title.text = f"Water level, last 2 minutes (%) - {len(levels)} points"
         if len(levels) >= 2:
             self._plot.set_data(*levels)
 

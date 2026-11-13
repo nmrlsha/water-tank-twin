@@ -7,8 +7,8 @@
                 double radius = 500
             }
             dictionary Perspective = {
-                double3 position = (1.4051476896678337, 1.416661188034745, 1.6269459538412294)
-                double3 target = (0.11440720894117806, 0.3625132108747373, 0.06342941484919384)
+                double3 position = (1.2684189037558493, 1.3049947645818145, 1.4613218633894163)
+                double3 target = (0.20043342466820246, 0.3087068120127151, 0.03270886451375277)
             }
             dictionary Right = {
                 double3 position = (-50000, 0, 0)
@@ -106,7 +106,7 @@ def "Render" (
                 bool omni:rtx:scene:useViewLightingMode
                 rel orderedVars = </Render/Vars/LdrColor>
                 custom bool overrideClipRange = 0
-                uniform int2 resolution = (590, 654)
+                uniform int2 resolution = (1239, 630)
             }
         }
     }
@@ -156,10 +156,10 @@ over "OmniverseKit_Persp" (
     float exposure:time = 0.02
     float focalLength = 18.147562
     float focusDistance = 400
-    custom uniform vector3d omni:kit:centerOfInterest = (0, 0, -2.2851308308363105)
-    float3 xformOp:rotateXYZ = (-27.47151, 39.540928, -7.01135e-14)
+    custom uniform vector3d omni:kit:centerOfInterest = (0, 0, -2.04306577684932)
+    float3 xformOp:rotateXYZ = (-29.18582, 36.780617, -7.3464563e-14)
     float3 xformOp:scale = (1, 1, 1)
-    double3 xformOp:translate = (1.4051476896678337, 1.416661188034745, 1.6269459538412294)
+    double3 xformOp:translate = (1.2684189037558493, 1.3049947645818145, 1.4613218633894163)
     uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
 }
 
@@ -230,7 +230,7 @@ def Xform "World"
             double size = 0.12
             double3 xformOp:rotateXYZ = (0, 0, 0)
             double3 xformOp:scale = (1, 1, 1)
-            double3 xformOp:translate = (0.4, 0, 0.06)
+            double3 xformOp:translate = (-0.5, 0, 0.06)
             uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
         }
 
@@ -246,8 +246,8 @@ def Xform "World"
             )
             {
                 uniform token axis = "Z"
-                float3[] extent = [(-0.015, -0.015, -0.325), (0.015, 0.015, 0.325)]
-                double height = 0.65
+                float3[] extent = [(-0.015, -0.015, -0.385), (0.015, 0.015, 0.385)]
+                double height = 0.77
                 rel material:binding = </World/Looks/Mat_Pipe> (
                     bindMaterialAs = "weakerThanDescendants"
                 )
@@ -256,7 +256,7 @@ def Xform "World"
                 custom int refinementLevel = 2
                 double3 xformOp:rotateXYZ = (0, 0, 0)
                 double3 xformOp:scale = (1, 1, 1)
-                double3 xformOp:translate = (0.4, 0, 0.445)
+                double3 xformOp:translate = (0.4, 0, 0.385)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
             }
 
@@ -285,8 +285,8 @@ def Xform "World"
         )
         {
             uniform token axis = "X"
-            float3[] extent = [(-0.15, -0.015, -0.015), (0.15, 0.015, 0.015)]
-            double height = 0.3
+            float3[] extent = [(-0.25, -0.015, -0.015), (0.25, 0.015, 0.015)]
+            double height = 0.5
             rel material:binding = </World/Looks/Mat_Pipe> (
                 bindMaterialAs = "weakerThanDescendants"
             )
@@ -295,7 +295,7 @@ def Xform "World"
             custom int refinementLevel = 2
             double3 xformOp:rotateXYZ = (0, 0, 0)
             double3 xformOp:scale = (1, 1, 1)
-            double3 xformOp:translate = (-0.29, 0, 0.05)
+            double3 xformOp:translate = (-0.4000000059604645, 0, 0.05)
             uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
         }
 
