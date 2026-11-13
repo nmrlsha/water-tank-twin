@@ -11,7 +11,7 @@ import urllib.error
 import urllib.request
 
 MAX_POINTS = 300                      # enough for a readable plot; /history thins the rest with `step`
-LIST_KEYS = ("rows", "data", "history", "items", "readings", "results", "aggregates")
+LIST_KEYS = ("points", "rows", "data", "history", "items", "readings", "results", "aggregates")
 
 
 def extract_rows(payload):
@@ -22,6 +22,9 @@ def extract_rows(payload):
         for key in LIST_KEYS:
             if isinstance(payload.get(key), list):
                 return [r for r in payload[key] if isinstance(r, dict)]
+        for value in payload.values():                    # any other key that holds a list of rows
+            if isinstance(value, list) and value and all(isinstance(r, dict) for r in value):
+                return value
     return []
 
 
