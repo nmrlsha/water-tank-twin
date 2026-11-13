@@ -43,7 +43,18 @@ def test_extract_rows_accepts_list_or_dict():
     assert hc.extract_rows(ROWS) == ROWS
     assert hc.extract_rows({"rows": ROWS}) == ROWS
     assert hc.extract_rows({"data": ROWS, "count": 6}) == ROWS
+    assert hc.extract_rows({"points": ROWS, "count": 6}) == ROWS            # the real API's key
+    assert hc.extract_rows({"asset_id": "tank_01", "stuff": ROWS}) == ROWS  # unknown key holding rows
     assert hc.extract_rows("junk") == [] and hc.extract_rows({"x": 1}) == []
+
+
+def test_real_api_answer_shape():
+    real = {"asset_id": "tank_01", "minutes": 5, "step": 30, "count": 1, "points": [
+        {"id": 10050, "asset_id": "tank_01", "timestamp": "2026-11-13T04:07:32Z",
+         "received_at": "2026-11-13T04:07:32.869224Z", "level_pct": 55.72, "inflow_lpm": 9.72,
+         "outflow_lpm": 0.0, "pump_on": False, "predicted_level_pct": 66.19, "alarm": "none"}]}
+    s = hc.summarize(hc.extract_rows(real))
+    assert s["levels"] == [55.72] and s["alarm_readings"] == 0
 
 
 def test_summarize():
