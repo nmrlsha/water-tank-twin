@@ -39,19 +39,21 @@ services:
       - processor
     restart: unless-stopped
 
-volumes:
-  tank_data:
-
 grafana:
   image: grafana/grafana:11.3.0
   ports:
       - "127.0.0.1:3000:3000"
   environment:
-  GF_INSTALL_PLUGINS: frser-sqlite-datasource
-  GF_SECURITY_ADMIN_PASSWORD: change-me
+    GF_INSTALL_PLUGINS: frser-sqlite-datasource
+    GF_SECURITY_ADMIN_PASSWORD: change-me
+
   volumes:
       - tank_data:/data
       - grafana_data:/var/lib/grafana
   depends_on:
       - processor
   restart: unless-stopped
+
+volumes:
+  tank_data:
+  grafana_data:
