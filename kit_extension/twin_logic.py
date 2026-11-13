@@ -147,3 +147,50 @@ def light_material(data, state):
     if state != "LIVE" or data is None:
         return MAT_PUMP_OFF                   # the model's grey material
     return alarm_material(data)
+
+
+# ---- Panel text (Step 5) -------------------------------------------------------------
+def trend(levels, window=30, steady_pct_per_min=1.0):
+    """Direction and speed of the level from recent readings (assumes about 1 reading per second).
+    Returns ('rising'|'falling'|'steady'|'unknown', change in % per minute)."""
+    values = list(levels)[-window:]
+    if len(values) < 5:
+        return "unknown", 0.0
+    rate = (values[-1] - values[0]) / (len(values) - 1) * 60.0
+    if abs(rate) < steady_pct_per_min:
+        return "steady", rate
+    return ("rising" if rate > 0 else "falling"), rate
+
+
+def trend_label(direction, rate):
+    if direction == "unknown":
+        return "collecting data..."
+    if direction == "steady":
+        return "steady"
+    return f"{direction} ({rate:+.1f} %/min)"
+
+
+def forecast_change_text(data):
+    """Forecast minus current level, e.g. '+12.3 % in 60 s'. '-' when there is no forecast."""
+    if not data or data.get("predicted_level_pct") is None:
+        return "-"
+    try:
+        change = float(data["predicted_level_pct"]) - float(data["level_pct"])
+    except (TypeError, ValueError, KeyError):
+        return "-"
+    return f"{change:+.1f} % in {data.get('horizon_s', 60)} s"
+
+
+def banner(data, state):
+    """The big status bar: (text, colour). Not-LIVE always wins, so stale data never looks healthy."""
+    if state != "LIVE" or data is None:
+        suffix = " - values are last known" if data is not None else ""
+        return f"{state}{suffix}", STATE_COLOURS.get(state, GREY)
+    level = alarm_level(data)
+    if level == "alarm":
+        return "ALARM: " + str(data.get("alarm")).replace("_", " "), RED
+    if level == "warning":
+        return "AI WARNING: " + str(data.get("ai_warning")).replace("_", " "), AMBER
+    if data.get("ai_warning") == "unavailable":
+        return "NORMAL (AI forecast starting up)", GREEN
+    return "NORMAL", GREEN
