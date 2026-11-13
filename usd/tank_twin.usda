@@ -7,8 +7,8 @@
                 double radius = 500
             }
             dictionary Perspective = {
-                double3 position = (1.546640917605911, 1.4092579867779023, 1.8061746648841863)
-                double3 target = (0.08622188600092362, 0.46755843810779707, 0.0222455356367246)
+                double3 position = (1.4051476896678337, 1.416661188034745, 1.6269459538412294)
+                double3 target = (0.11440720894117806, 0.3625132108747373, 0.06342941484919384)
             }
             dictionary Right = {
                 double3 position = (-50000, 0, 0)
@@ -102,10 +102,11 @@ def "Render" (
                 float omni:rtx:rtpt:fireflyFilter:maxUnexposedIntensityPerSampleDiffuse = 3199.9995
                 uint omni:rtx:rtpt:maxVolumeBounces = 15
                 float omni:rtx:rtpt:modulatingRoughnessThreshold = 0.08
+                bool omni:rtx:scene:hydra:mdlMaterialWarmup = 1
                 bool omni:rtx:scene:useViewLightingMode
                 rel orderedVars = </Render/Vars/LdrColor>
                 custom bool overrideClipRange = 0
-                uniform int2 resolution = (1296, 545)
+                uniform int2 resolution = (590, 654)
             }
         }
     }
@@ -155,10 +156,10 @@ over "OmniverseKit_Persp" (
     float exposure:time = 0.02
     float focalLength = 18.147562
     float focusDistance = 400
-    custom uniform vector3d omni:kit:centerOfInterest = (0, 0, -2.4903865013320994)
-    float3 xformOp:rotateXYZ = (-22.21814, 39.305576, -1.4210855e-13)
+    custom uniform vector3d omni:kit:centerOfInterest = (0, 0, -2.2851308308363105)
+    float3 xformOp:rotateXYZ = (-27.47151, 39.540928, -7.01135e-14)
     float3 xformOp:scale = (1, 1, 1)
-    double3 xformOp:translate = (1.546640917605911, 1.4092579867779023, 1.8061746648841863)
+    double3 xformOp:translate = (1.4051476896678337, 1.416661188034745, 1.6269459538412294)
     uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
 }
 
@@ -194,7 +195,7 @@ def Xform "World"
         def Xform "Water"
         {
             double3 xformOp:rotateXYZ = (0, 0, 0)
-            double3 xformOp:scale = (1, 1, 0.5)
+            double3 xformOp:scale = (1, 1, 0.1)
             double3 xformOp:translate = (0, 0, 0)
             uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
 
@@ -1822,6 +1823,7 @@ def Xform "Environment"
 }
 
 over "OmniverseKit_Front" (
+    prepend apiSchemas = ["OmniRtxCameraAutoExposureAPI_1", "OmniRtxCameraExposureAPI_1"]
     customData = {
         dictionary omni = {
             dictionary kit = {
@@ -1836,6 +1838,9 @@ over "OmniverseKit_Front" (
 )
 {
     float2 clippingRange = (1, 10000000)
+    float exposure:fStop = 5
+    float exposure:responsivity = 1.1026709
+    float exposure:time = 0.02
     float horizontalAperture = 5000
     custom uniform vector3d omni:kit:centerOfInterest = (0, 0, -50000)
     token projection = "orthographic"
@@ -1847,6 +1852,7 @@ over "OmniverseKit_Front" (
 }
 
 over "OmniverseKit_Right" (
+    prepend apiSchemas = ["OmniRtxCameraAutoExposureAPI_1", "OmniRtxCameraExposureAPI_1"]
     customData = {
         dictionary omni = {
             dictionary kit = {
@@ -1861,6 +1867,9 @@ over "OmniverseKit_Right" (
 )
 {
     float2 clippingRange = (1, 10000000)
+    float exposure:fStop = 5
+    float exposure:responsivity = 1.1026709
+    float exposure:time = 0.02
     float horizontalAperture = 5000
     custom uniform vector3d omni:kit:centerOfInterest = (0, 0, -50000)
     token projection = "orthographic"
@@ -1872,6 +1881,7 @@ over "OmniverseKit_Right" (
 }
 
 over "OmniverseKit_Top" (
+    prepend apiSchemas = ["OmniRtxCameraAutoExposureAPI_1", "OmniRtxCameraExposureAPI_1"]
     customData = {
         dictionary omni = {
             dictionary kit = {
@@ -1886,6 +1896,9 @@ over "OmniverseKit_Top" (
 )
 {
     float2 clippingRange = (1, 10000000)
+    float exposure:fStop = 5
+    float exposure:responsivity = 1.1026709
+    float exposure:time = 0.02
     float horizontalAperture = 5000
     custom uniform vector3d omni:kit:centerOfInterest = (0, 0, -50000)
     token projection = "orthographic"

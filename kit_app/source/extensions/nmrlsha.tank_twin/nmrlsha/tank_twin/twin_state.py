@@ -29,6 +29,7 @@ class TwinState:
         self.status_received_at = None
         self.rejected = 0                # unusable messages seen by the extension
         self.delays = deque(maxlen=600)  # data-to-display delays in seconds
+        self.levels = deque(maxlen=120)  # last 2 minutes of water level, for the trend plot
 
     def apply(self, items):
         """Feed in the list from TankListener.drain(). Returns True if the data changed."""
@@ -43,12 +44,19 @@ class TwinState:
             elif logic.is_valid_enriched(message):
                 self.data = message
                 changed = True
+                try:
+                    self.levels.append(float(message["level_pct"]))
+                except (TypeError, ValueError):
+                    pass
                 sent_at = timestamp_to_epoch(message["timestamp"])
                 if sent_at is not None:
                     self.delays.append(received_at - sent_at)
             else:
                 self.rejected += 1
         return changed
+
+    def trend(self):
+        return logic.trend(self.levels)
 
     def connection(self):
         age = None if self.status_received_at is None else self._clock() - self.status_received_at
